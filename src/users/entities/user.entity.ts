@@ -23,7 +23,7 @@ export class User {
   hashPassword: string;
 
   @ApiProperty({ example: 'client' })
-  @Column({ type: 'enum', enum: ROLES, default: 'client' })
+  @Column({ type: 'enum', enum: ROLES, default: ROLES.CLIENT })
   role: ROLES;
 
   @ApiProperty({ example: 'Acme Ltd' })
