@@ -27,7 +27,6 @@ services:
       MYSQL_PASSWORD: ${MYSQL_PASSWORD}
     volumes:
   - mysql_data:/var/lib/mysql
-  - ./docker/init/mysql:/docker-entrypoint-initdb.d:ro
     ports:
       - '3306:3306'
     healthcheck:
@@ -42,7 +41,6 @@ services:
     image: mongo:6.0
     volumes:
   - mongo_data:/data/db
-  - ./docker/init/mongo:/docker-entrypoint-initdb.d:ro
     ports:
       - '27017:27017'
     networks:
