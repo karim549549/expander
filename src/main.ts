@@ -1,3 +1,11 @@
+import { webcrypto } from 'crypto';
+
+// Polyfill for environments where global.crypto is not available
+if (typeof global.crypto === 'undefined') {
+  // @ts-ignore
+  global.crypto = webcrypto;
+}
+
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
