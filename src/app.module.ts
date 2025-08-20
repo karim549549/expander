@@ -4,6 +4,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { ENV_LOCAL_FILE_PATH } from './common/constants/env.constants';
 import {
   DB_DEFAULT_HOST,
+  DB_DEFAULT_NAME,
   DB_DEFAULT_PASSWORD,
   DB_DEFAULT_PORT,
   DB_DEFAULT_USER,
@@ -31,7 +32,7 @@ import { UsersModule } from './users/users.module';
         username: configService.get<string>(DB_USER_KEY) || DB_DEFAULT_USER,
         password:
           configService.get<string>(DB_PASSWORD_KEY) || DB_DEFAULT_PASSWORD,
-        database: configService.get<string>(DB_NAME_KEY),
+        database: configService.get<string>(DB_NAME_KEY) || DB_DEFAULT_NAME,
         synchronize: false,
         autoLoadEntities: true,
         logging: true,
@@ -41,5 +42,7 @@ import { UsersModule } from './users/users.module';
       }),
     }),
   ],
+  controllers: [],
+  providers: [],
 })
 export class AppModule {}

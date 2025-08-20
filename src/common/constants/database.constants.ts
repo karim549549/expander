@@ -12,3 +12,4 @@ export const DB_DEFAULT_HOST = 'serverless-northeurope.sysp0000.db3.skysql.com';
 export const DB_DEFAULT_PORT = 4153;
 export const DB_DEFAULT_USER = 'dbpbf33325877';
 export const DB_DEFAULT_PASSWORD = 's35-Pqhc54Ocf210EkTJLQg';
+export const DB_DEFAULT_NAME = 'expander_db';
