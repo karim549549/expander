@@ -1,65 +1,43 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { MongooseModule } from '@nestjs/mongoose';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
-import { UsersModule } from './users/users.module';
+import { ENV_LOCAL_FILE_PATH } from './common/constants/env.constants';
+import {
+  DB_DEFAULT_HOST,
+  DB_DEFAULT_PASSWORD,
+  DB_DEFAULT_PORT,
+  DB_DEFAULT_USER,
+  DB_HOST_KEY,
+  DB_NAME_KEY,
+  DB_PASSWORD_KEY,
+  DB_PORT_KEY,
+  DB_TYPE,
+  DB_USER_KEY,
+} from './common/constants/database.constants';
+
 @Module({
   imports: [
-    ConfigModule.forRoot({ isGlobal: true }),
-    // TypeORM dynamic config: prefer DATABASE_URL (Railway) else use individual MYSQL_* vars
+    ConfigModule.forRoot({ isGlobal: true, envFilePath: ENV_LOCAL_FILE_PATH }),
+
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
-      useFactory: async (config: ConfigService) => {
-        const databaseUrl = config.get<string>('DATABASE_URL');
-        if (databaseUrl) {
-          return {
-            type: 'mysql',
-            url: databaseUrl,
-            synchronize: config.get('MYSQL_SYNCHRONIZE') === 'true',
-            logging: false,
-            entities: [__dirname + '/**/*.entity{.ts,.js}'],
-          } as any;
-        }
-
-        return {
-          type: 'mysql',
-          host: config.get('MYSQL_HOST', '127.0.0.1'),
-          port: parseInt(config.get('MYSQL_PORT', '3306'), 10),
-          username: config.get('MYSQL_USER', 'root'),
-          password: config.get('MYSQL_PASSWORD', ''),
-          database: config.get('MYSQL_DATABASE', 'expander_db'),
-          synchronize: config.get('MYSQL_SYNCHRONIZE') === 'true',
-          logging: false,
-          entities: [__dirname + '/**/*.entity{.ts,.js}'],
-        } as any;
-      },
+      useFactory: (configService: ConfigService) => ({
+        type: DB_TYPE,
+        host: configService.get<string>(DB_HOST_KEY) || DB_DEFAULT_HOST,
+        port: configService.get<number>(DB_PORT_KEY) || DB_DEFAULT_PORT,
+        username: configService.get<string>(DB_USER_KEY) || DB_DEFAULT_USER,
+        password:
+          configService.get<string>(DB_PASSWORD_KEY) || DB_DEFAULT_PASSWORD,
+        database: configService.get<string>(DB_NAME_KEY),
+        synchronize: false,
+        autoLoadEntities: true,
+        logging: true,
+        ssl: {
+          rejectUnauthorized: false,
+        },
+      }),
     }),
-
-    // Mongoose dynamic config: prefer MONGO_ATLAS_URI else MONGO_URI
-    MongooseModule.forRootAsync({
-      imports: [ConfigModule],
-      inject: [ConfigService],
-      useFactory: async (config: ConfigService) => {
-        const atlas = config.get<string>('MONGO_ATLAS_URI');
-        if (atlas) {
-          return {
-            uri: atlas,
-          };
-        }
-        return {
-          uri: config.get<string>(
-            'MONGO_URI',
-            'mongodb://127.0.0.1:27017/expander_mongo',
-          ),
-        };
-      },
-    }),
-    UsersModule,
   ],
-  controllers: [AppController],
-  providers: [AppService],
 })
 export class AppModule {}
