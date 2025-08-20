@@ -1,11 +1,3 @@
-// Ensure crypto is available on globalThis for libraries that call crypto.randomUUID()
-// This must run before importing AppModule/TypeORM so helpers that call
-// crypto.randomUUID() during module evaluation don't crash.
-import * as nodeCrypto from 'crypto';
-if (!(globalThis as any).crypto) {
-  (globalThis as any).crypto = nodeCrypto;
-}
-
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
