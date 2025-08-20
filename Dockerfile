@@ -21,6 +21,8 @@ ENV NODE_ENV=production
 COPY --from=builder /app/package*.json ./
 COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/dist ./dist
+COPY ./scripts/wait-for.sh ./scripts/wait-for.sh
+RUN chmod +x ./scripts/wait-for.sh
 
 EXPOSE 3000
 CMD ["node", "dist/main.js"]

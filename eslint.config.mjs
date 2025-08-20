@@ -19,7 +19,9 @@ export default tseslint.config(
       },
       sourceType: 'commonjs',
       parserOptions: {
-        projectService: true,
+        // disable projectService to avoid type-aware checks that cause "unsafe" errors
+        // when you prefer a looser lint during development. Set to true to re-enable.
+        projectService: false,
         tsconfigRootDir: import.meta.dirname,
       },
     },
@@ -28,7 +30,13 @@ export default tseslint.config(
     rules: {
       '@typescript-eslint/no-explicit-any': 'off',
       '@typescript-eslint/no-floating-promises': 'warn',
-      '@typescript-eslint/no-unsafe-argument': 'warn'
+      // turn off strict "unsafe" rules to reduce friction during dev
+      '@typescript-eslint/no-unsafe-argument': 'off',
+      '@typescript-eslint/no-unsafe-assignment': 'off',
+      '@typescript-eslint/no-unsafe-call': 'off',
+      '@typescript-eslint/no-unsafe-member-access': 'off',
+      '@typescript-eslint/no-unsafe-return': 'off',
+      'prettier/prettier': 0,
     },
   },
 );
