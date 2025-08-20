@@ -14,9 +14,11 @@ import {
   DB_TYPE,
   DB_USER_KEY,
 } from './common/constants/database.constants';
+import { UsersModule } from './users/users.module';
 
 @Module({
   imports: [
+    UsersModule,
     ConfigModule.forRoot({ isGlobal: true, envFilePath: ENV_LOCAL_FILE_PATH }),
 
     TypeOrmModule.forRootAsync({
