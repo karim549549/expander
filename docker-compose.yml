@@ -1,0 +1,69 @@
+# docker-compose for local development / testing
+# Services: app (NestJS), mysql, mongo, redis (optional for BullMQ), mailhog (SMTP/mock)
+version: '3.8'
+
+services:
+  app:
+    build: .
+    env_file:
+      - ./.env.local
+    ports:
+      - '3000:3000'
+    depends_on:
+      - mysql
+      - mongo
+      - redis
+    restart: unless-stopped
+    networks:
+      - expander-net
+
+  mysql:
+    image: mysql:8.0
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+    volumes:
+      - mysql_data:/var/lib/mysql
+    ports:
+      - '3306:3306'
+    healthcheck:
+      test: ['CMD', 'mysqladmin', 'ping', '-h', 'localhost']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - expander-net
+
+  mongo:
+    image: mongo:6.0
+    volumes:
+      - mongo_data:/data/db
+    ports:
+      - '27017:27017'
+    networks:
+      - expander-net
+
+  redis:
+    image: redis:7
+    ports:
+      - '6379:6379'
+    networks:
+      - expander-net
+
+  mailhog:
+    image: mailhog/mailhog
+    ports:
+      - '1025:1025' # SMTP
+      - '8025:8025' # Web UI
+    networks:
+      - expander-net
+
+volumes:
+  mysql_data:
+  mongo_data:
+
+networks:
+  expander-net:
+    driver: bridge
