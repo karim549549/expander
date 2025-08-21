@@ -33,7 +33,9 @@ import { UsersModule } from './users/users.module';
         password:
           configService.get<string>(DB_PASSWORD_KEY) || DB_DEFAULT_PASSWORD,
         database: configService.get<string>(DB_NAME_KEY) || DB_DEFAULT_NAME,
-        synchronize: false,
+        synchronize: process.env.NODE_ENV !== 'production',
+        entities: [__dirname + '/**/*.entity{.ts,.js}'],
+        migrations: [__dirname + '/migrations/**/*{.ts,.js}'],
         autoLoadEntities: true,
         logging: true,
         ssl: {
@@ -45,4 +47,6 @@ import { UsersModule } from './users/users.module';
   controllers: [],
   providers: [],
 })
-export class AppModule {}
+export class AppModule {
+  constructor() {}
+}

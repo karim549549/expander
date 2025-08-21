@@ -4,7 +4,7 @@ import {
   Column,
   CreateDateColumn,
   UpdateDateColumn,
-  Index,
+  // Index, // Removed this import as it's no longer needed
 } from 'typeorm';
 import { ApiProperty } from '@nestjs/swagger';
 import { ROLES } from '../../libs/types/user.type';
@@ -15,7 +15,7 @@ export class User {
   id: string;
 
   @ApiProperty({ example: 'founder@example.com' })
-  @Index({ unique: true })
+  // @Index({ unique: true }) // Removed this line
   @Column({ type: 'varchar', length: 255, unique: true })
   email: string;
 
