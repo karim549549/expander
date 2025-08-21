@@ -9,9 +9,17 @@ if (typeof global.crypto === 'undefined') {
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import { AllExceptionsFilter } from './common/filters/all-exceptions.filter'; // New import
+import { ValidationPipe } from '@nestjs/common'; // Added for global validation pipe
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+
+  // Register global exception filter
+  app.useGlobalFilters(new AllExceptionsFilter());
+
+  // Register global validation pipe (optional, but good practice)
+  app.useGlobalPipes(new ValidationPipe({ whitelist: true, transform: true }));
 
   const config = new DocumentBuilder()
     .setTitle(process.env.SWAGGER_TITLE ?? 'Expander API')
