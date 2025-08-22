@@ -14,6 +14,12 @@ import {
 } from './common/constants/database.constants';
 import { UsersModule } from './users/users.module';
 import { DocumentsModule } from './documents/documents.module';
+import { AuthModule } from './auth/auth.module';
+import { EmailModule } from './email/email.module';
+import { ProjectsModule } from './projects/projects.module';
+import { VendorsModule } from './vendors/vendors.module';
+import { MatchesModule } from './matches/matches.module';
+import { ClientsModule } from './clients/clients.module';
 
 @Module({
   imports: [
@@ -34,6 +40,8 @@ import { DocumentsModule } from './documents/documents.module';
         entities: [__dirname + '/**/*.entity{.ts,.js}'],
         autoLoadEntities: true,
         logging: true,
+        keepConnectionAlive: true,
+        dropSchema: true,
         ssl: {
           rejectUnauthorized: false,
         },
@@ -46,6 +54,12 @@ import { DocumentsModule } from './documents/documents.module';
         uri: configService.get<string>(MONGO_URI_KEY),
       }),
     }),
+    AuthModule,
+    EmailModule,
+    ProjectsModule,
+    VendorsModule,
+    MatchesModule,
+    ClientsModule,
   ],
   controllers: [],
   providers: [],

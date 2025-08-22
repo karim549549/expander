@@ -15,7 +15,7 @@ export class UsersService {
 
   async create(dto: CreateUserDto) {
     const saltRounds = 10;
-    const hashed = await bcrypt.hash(dto.hashPassword, saltRounds);
+    const hashed = await bcrypt.hash(dto.password, saltRounds);
     const user = this.repo.create({
       email: dto.email,
       hashPassword: hashed,

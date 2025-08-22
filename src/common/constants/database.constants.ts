@@ -16,3 +16,7 @@ export const DB_DEFAULT_NAME = 'expander_db';
 
 // Keys for ConfigService (MongoDB)
 export const MONGO_URI_KEY = 'MONGO_URI';
+
+// Keys for ConfigService (JWT)
+export const JWT_SECRET_KEY = 'JWT_ACCESS_TOKEN_SECRET';
+export const JWT_EXPIRATION_KEY = 'JWT_ACCESS_TOKEN_EXPIRATION'; // New constant
