@@ -6,6 +6,13 @@ export type DocumentDocument = HydratedDocument<Document>;
 
 @Schema()
 export class Document {
+  @ApiProperty({
+    example: 'a1b2c3d4-e5f6-7890-1234-567890abcdef',
+    description: 'ID of the project this document belongs to',
+  })
+  @Prop({ required: true, index: true }) // Add index for efficient lookup
+  projectId: string;
+
   @ApiProperty({ example: 'My Document Title' }) // Added ApiProperty
   @Prop({ required: true })
   title: string;

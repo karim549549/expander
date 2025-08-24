@@ -20,6 +20,7 @@ import { ProjectsModule } from './projects/projects.module';
 import { VendorsModule } from './vendors/vendors.module';
 import { MatchesModule } from './matches/matches.module';
 import { ClientsModule } from './clients/clients.module';
+import { AnalyticsModule } from './analytics/analytics.module';
 
 @Module({
   imports: [
@@ -60,6 +61,7 @@ import { ClientsModule } from './clients/clients.module';
     VendorsModule,
     MatchesModule,
     ClientsModule,
+    AnalyticsModule,
   ],
   controllers: [],
   providers: [],

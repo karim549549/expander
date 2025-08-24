@@ -11,6 +11,7 @@ import { AppModule } from './app.module';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { AllExceptionsFilter } from './common/filters/all-exceptions.filter'; // New import
 import { ValidationPipe } from '@nestjs/common'; // Added for global validation pipe
+import { StandardResponseInterceptor } from './common/interceptors/standard-response.interceptor';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -18,13 +19,19 @@ async function bootstrap() {
   // Register global exception filter
   app.useGlobalFilters(new AllExceptionsFilter());
 
+  // Register global interceptor
+  app.useGlobalInterceptors(new StandardResponseInterceptor());
+
   // Register global validation pipe (optional, but good practice)
   app.useGlobalPipes(new ValidationPipe({ whitelist: true, transform: true }));
 
   const config = new DocumentBuilder()
     .setTitle(process.env.SWAGGER_TITLE ?? 'Expander API')
     .setDescription(
-      process.env.SWAGGER_DESC ?? 'Global expansion management API',
+      (process.env.SWAGGER_DESC ?? 'Global expansion management API') + 
+      '\n\n**Admin User:**\n' + 
+      '- Email: admin@expander.com\n' + 
+      '- Password: admin123\n'
     )
     .setVersion(process.env.SWAGGER_VERSION ?? '1.0')
     .addBearerAuth()

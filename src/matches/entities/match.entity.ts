@@ -12,9 +12,9 @@ import { Vendor } from '../../vendors/entities/vendor.entity'; // Assuming Vendo
 
 @Entity('matches')
 export class Match {
-  @ApiProperty({ example: 1 })
-  @PrimaryGeneratedColumn()
-  id: number;
+  @ApiProperty({ example: 'a1b2c3d4-e5f6-7890-1234-567890abcdef', description: 'Match ID (UUID)' })
+  @PrimaryGeneratedColumn('uuid') // Changed to UUID
+  id: string;
 
   @ApiProperty({ example: 'a1b2c3d4-e5f6-7890-1234-567890abcdef', description: 'ID of the project associated with the match' })
   @Column({ type: 'uuid' }) // Changed type to uuid

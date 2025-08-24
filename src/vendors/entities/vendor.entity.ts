@@ -9,9 +9,9 @@ import { ApiProperty } from '@nestjs/swagger';
 
 @Entity('vendors')
 export class Vendor {
-  @ApiProperty({ example: 1 })
-  @PrimaryGeneratedColumn()
-  id: number;
+  @ApiProperty({ example: 'a1b2c3d4-e5f6-7890-1234-567890abcdef', description: 'Vendor ID (UUID)' })
+  @PrimaryGeneratedColumn('uuid') // Changed to UUID
+  id: string;
 
   @ApiProperty({ example: 'Global Legal Solutions Inc.' })
   @Column({ type: 'varchar', length: 255 })

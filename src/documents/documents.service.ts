@@ -3,6 +3,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Document, DocumentDocument } from './schemas/document.schema';
 import { CreateDocumentDto } from './dto/create-document.dto';
+
 @Injectable()
 export class DocumentsService {
   constructor(
@@ -14,7 +15,29 @@ export class DocumentsService {
     return createdDocument.save();
   }
 
-  async findAll(): Promise<Document[]> {
-    return this.documentModel.find().exec();
+  async findAll(page: number, limit: number): Promise<[Document[], number]> {
+    const skip = (page - 1) * limit;
+    const data = await this.documentModel.find().skip(skip).limit(limit).exec();
+    const total = await this.documentModel.countDocuments().exec();
+    return [data, total];
+  }
+
+  async findByProject(projectId: string): Promise<Document[]> {
+    return this.documentModel.find({ projectId }).exec();
+  }
+
+  async findByTag(tag: string): Promise<Document[]> {
+    return this.documentModel.find({ tags: tag }).exec();
+  }
+
+  async findByText(searchText: string): Promise<Document[]> {
+    return this.documentModel
+      .find({
+        $or: [
+          { title: { $regex: searchText, $options: 'i' } },
+          { content: { $regex: searchText, $options: 'i' } },
+        ],
+      })
+      .exec();
   }
 }

@@ -30,6 +30,13 @@ export class Client {
   @Column({ type: 'varchar', length: 255 })
   contactEmail: string;
 
+  @ApiProperty({
+    example: 'a1b2c3d4-e5f6-7890-1234-567890abcdef',
+    description: 'User ID (UUID)',
+  })
+  @Column({ type: 'uuid' })
+  userId: string;
+
   @ApiProperty()
   @CreateDateColumn({ type: 'timestamp' })
   createdAt: Date;

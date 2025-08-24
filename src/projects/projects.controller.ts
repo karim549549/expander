@@ -8,24 +8,28 @@ import {
   Delete,
   HttpStatus,
   UseGuards,
-  Request,
+  Query,
+  Req,
 } from '@nestjs/common';
 import { ProjectsService } from './projects.service';
 import { CreateProjectDto } from './dto/create-project.dto';
 import { UpdateProjectDto } from './dto/update-project.dto';
-import {
-  ApiTags,
-  ApiOperation,
-  ApiResponse,
-  ApiBody,
-  ApiBearerAuth,
-} from '@nestjs/swagger';
+import { ApiTags, ApiBearerAuth, ApiQuery } from '@nestjs/swagger';
 import { Project } from './entities/project.entity';
-import { StandardResponse } from '../common/responses/standard-response';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../common/guards/roles.guard';
 import { Roles } from '../common/decorators/roles.decorator';
 import { ROLES } from '../libs/types/user.type';
+import {
+  ApiCreateProjectOperation,
+  ApiFindAllProjectsOperation,
+  ApiFindOneProjectOperation,
+  ApiUpdateProjectOperation,
+  ApiRemoveProjectOperation,
+  ApiPaginatedResponse,
+} from '../common/decorators/swagger-responses.decorator';
+import { PaginationResponse } from '../common/responses/pagination-response';
+import type { CustomRequest } from '../libs/types/request.type';
 
 @ApiTags('projects')
 @Controller('projects')
@@ -35,72 +39,80 @@ export class ProjectsController {
   constructor(private readonly projectsService: ProjectsService) {}
 
   @Post()
-  @ApiOperation({ summary: 'Create a new project' })
-  @ApiBody({ type: CreateProjectDto })
-  @ApiResponse({
-    status: HttpStatus.CREATED,
-    description: 'Project created successfully',
-    type: StandardResponse,
-  })
+  @ApiCreateProjectOperation(
+    'Create a new project',
+    CreateProjectDto,
+    'Project created successfully',
+  )
   @Roles(ROLES.ADMIN, ROLES.CLIENT) // Admins or Clients can create projects
-  async create(@Body() createProjectDto: CreateProjectDto): Promise<StandardResponse<Project>> {
-    // TODO: Add logic to ensure client can only create projects for their own clientId if not ADMIN
-    const project = await this.projectsService.create(createProjectDto);
-    return new StandardResponse(project, 'Project created successfully', HttpStatus.CREATED);
+  async create(
+    @Body() createProjectDto: CreateProjectDto,
+    @Req() req: CustomRequest,
+  ): Promise<Project> {
+    return this.projectsService.create(createProjectDto, req.user);
   }
 
   @Get()
-  @ApiOperation({ summary: 'Get all projects' })
-  @ApiResponse({
-    status: HttpStatus.OK,
-    description: 'List of all projects',
-    type: StandardResponse,
+  @ApiFindAllProjectsOperation('Get all projects', 'List of all projects')
+  @ApiQuery({
+    name: 'page',
+    required: false,
+    type: Number,
+    description: 'Page number (default: 1)',
   })
+  @ApiQuery({
+    name: 'limit',
+    required: false,
+    type: Number,
+    description: 'Items per page (default: 10)',
+  })
+  @ApiPaginatedResponse(Project)
   @Roles(ROLES.ADMIN, ROLES.CLIENT) // Admins or Clients can view projects
-  async findAll(@Request() req): Promise<StandardResponse<Project[]>> {
-    // TODO: Add logic to filter projects by client if not ADMIN
-    const projects = await this.projectsService.findAll();
-    return new StandardResponse(projects, 'Projects retrieved successfully');
+  async findAll(
+    @Query('page') page = 1,
+    @Query('limit') limit = 10,
+    @Req() req: CustomRequest,
+  ): Promise<PaginationResponse<Project>> {
+    const [data, total] = await this.projectsService.findAll(
+      page,
+      limit,
+      req.user,
+    );
+    return new PaginationResponse(data, total, page, limit);
   }
 
   @Get(':id')
-  @ApiOperation({ summary: 'Get a project by ID' })
-  @ApiResponse({
-    status: HttpStatus.OK,
-    description: 'Project details',
-    type: StandardResponse,
-  })
-  @ApiResponse({ status: HttpStatus.NOT_FOUND, description: 'Project not found' })
+  @ApiFindOneProjectOperation('Get a project by ID', 'Project details')
   @Roles(ROLES.ADMIN, ROLES.CLIENT) // Admins or Clients can view projects
-  async findOne(@Param('id') id: string, @Request() req): Promise<StandardResponse<Project>> {
-    // TODO: Add logic to ensure client can only view their own project if not ADMIN
-    const project = await this.projectsService.findOne(id); // Removed +
-    return new StandardResponse(project, 'Project retrieved successfully');
+  async findOne(
+    @Param('id') id: string,
+    @Req() req: CustomRequest,
+  ): Promise<Project> {
+    return this.projectsService.findOne(id, req.user);
   }
 
   @Patch(':id')
-  @ApiOperation({ summary: 'Update a project by ID' })
-  @ApiBody({ type: UpdateProjectDto })
-  @ApiResponse({
-    status: HttpStatus.OK,
-    description: 'Project updated successfully',
-    type: StandardResponse,
-  })
-  @ApiResponse({ status: HttpStatus.NOT_FOUND, description: 'Project not found' })
+  @ApiUpdateProjectOperation(
+    'Update a project by ID',
+    UpdateProjectDto,
+    'Project updated successfully',
+  )
   @Roles(ROLES.ADMIN, ROLES.CLIENT) // Admins or Clients can update projects
-  async update(@Param('id') id: string, @Body() updateProjectDto: UpdateProjectDto): Promise<StandardResponse<Project>> {
-    // TODO: Add logic to ensure client can only update their own project if not ADMIN
-    const project = await this.projectsService.update(id, updateProjectDto); // Removed +
-    return new StandardResponse(project, 'Project updated successfully');
+  async update(
+    @Param('id') id: string,
+    @Body() updateProjectDto: UpdateProjectDto,
+    @Req() req: CustomRequest,
+  ): Promise<Project> {
+    return this.projectsService.update(id, updateProjectDto, req.user);
   }
 
   @Delete(':id')
-  @ApiOperation({ summary: 'Delete a project by ID' })
-  @ApiResponse({ status: HttpStatus.NO_CONTENT, description: 'Project deleted successfully' })
-  @ApiResponse({ status: HttpStatus.NOT_FOUND, description: 'Project not found' })
+  @ApiRemoveProjectOperation(
+    'Delete a project by ID',
+    'Project deleted successfully',
+  )
   @Roles(ROLES.ADMIN) // Only admins can delete projects
-  async remove(@Param('id') id: string): Promise<StandardResponse<void>> {
-    await this.projectsService.remove(id); // Removed +
-    return new StandardResponse(undefined, 'Project deleted successfully', HttpStatus.NO_CONTENT);
+  async remove(@Param('id') id: string): Promise<void> {
+    return this.projectsService.remove(id);
   }
 }
